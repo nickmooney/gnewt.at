@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<title>  2013  August | Gnewt&#039;s Blag</title>
+<meta name="description" content="Publishing Data to Redis with Django Signals" />
+<link rel="alternate" type="application/rss+xml" title="Gnewt&#039;s Blag RSS Feed" href="../../feed/index.html" />
+<link rel="alternate" type="application/atom+xml" title="Gnewt&#039;s Blag Atom Feed" href="../../feed/atom/index.html" /> 
+<link rel="pingback" href="http://www.gnewt.at/blog/xmlrpc.php" />
+
+<link rel="stylesheet" href="../../wp-content/themes/monochrome/style.css" type="text/css" />
+<link rel="stylesheet" href="../../wp-content/themes/monochrome/comment-style.css" type="text/css" />
+<!--[if lt IE 7]>
+<link rel="stylesheet" href="http://www.gnewt.at/blog/wp-content/themes/monochrome/ie6.css" type="text/css" />
+<![endif]--> 
+<style type="text/css">
+.post img, .post a img { border:1px solid #ccc; padding:5px; margin:0 10px 0 0;  background:#f2f2f2; }
+.post a:hover img { border:1px solid #38a1e5; background:#9cd1e1; }
+.post img.wp-smiley { border:0px; padding:0px; margin:0px; background:none; }
+</style>
+
+ 
+<link rel='dns-prefetch' href='http://s.w.org/' />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.gnewt.at\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.7.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),!(j.toDataURL().length<3e3)&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,65039,8205,55356,57096),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,55356,57096),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55357,56425,55356,57341,8205,55357,56507),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55357,56425,55356,57341,55357,56507),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<!-- This site uses the Google Analytics by MonsterInsights plugin v5.5.4 - Universal enabled - https://www.monsterinsights.com/ -->
+<script type="text/javascript">
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');
+
+	__gaTracker('create', 'UA-32955882-1', 'auto');
+	__gaTracker('set', 'forceSSL', true);
+	__gaTracker('send','pageview');
+
+</script>
+<!-- / Google Analytics by MonsterInsights -->
+<script type='text/javascript' src='../../wp-includes/js/jquery/jquery.js%3Fver=1.12.4'></script>
+<script type='text/javascript' src='../../wp-includes/js/jquery/jquery-migrate.min.js%3Fver=1.4.1'></script>
+<link rel='https://api.w.org/' href='../../wp-json/index.html' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../xmlrpc.php%3Frsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.7.2" />
+<style type="text/css" id="syntaxhighlighteranchor"></style>
+<script type="text/javascript" src="../../wp-content/themes/monochrome/js/scroll.js"></script>
+<script type="text/javascript" src="../../wp-content/themes/monochrome/js/jscript.js"></script>
+<script type="text/javascript" src="../../wp-content/themes/monochrome/js/comment.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-15905622-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</head>
+
+<body>
+<div id="wrapper">
+
+ <div id="header">
+
+  <div id="header_top">
+
+   <div id="logo">
+       <a href="../../../index.html">Gnewt&#039;s Blag</a>
+    <h1>She turned me into a Gnewt! I got better&#8230;</h1>
+      </div>
+
+      <div class="header_menu">
+    <ul class="menu">
+     <li class="page_item"><a href="../../../index.html">HOME</a></li>
+     <li class="page_item page-item-2"><a href="../../index.html%3Fp=2.html">/usr/bin/whoami</a></li>
+    </ul>
+   </div>
+   
+  </div>
+
+  </div><!-- #header end -->  <div id="contents" class="clearfix">
+
+   <div id="left_col">
+
+
+    <div id="header_meta">
+
+          <p>Archive for <span id="keyword">August, 2013</span></p>
+
+     
+    </div><!-- #header_meta end -->
+
+
+    <div class="post_odd">
+     <div class="post clearfix">
+      <div class="post_content_wrapper">
+       <h2 class="post_title"><a href="../../index.html%3Fp=244.html">Publishing Data to Redis with Django Signals</a></h2>
+       <div class="post_content">
+        <p>Just something I found and thought was kind of cool. I&#8217;m currently working on a project that uses Django for its frontend, but eventually passes the user to a JavaScript frontend that talks to the Node.js / Redis backend with Socket.IO. I needed a way to store data in Redis whenever a specific Django model was saved. I looked up &#8216;Django + redis&#8217; beforehand, but the existing projects seem to be mostly cache-oriented, and as far as I know Django doesn&#8217;t have a standard adapter for Redis. No worries &#8212; it&#8217;s all Python!</p>
+<p>Django signals let you execute functions whenever a signal is emitted, but specifically in my case, when a model is saved. You can put your signals code anywhere, but I like to make a &#8216;signals.py&#8217; in the app directory and then just add the line &#8216;import signals&#8217; to the app&#8217;s __init__.py. I subscribed to the Django model saved and model deleted signals with functions that connect to Redis and add some of the relevant data to a hash. Hashes in Redis are very much like dicts in Python, and <a href="https://github.com/andymccurdy/redis-py" onclick="__gaTracker('send', 'event', 'outbound-article', 'https://github.com/andymccurdy/redis-py', 'Andy McCurdy&#8217;s redis-py library');">Andy McCurdy&#8217;s redis-py library</a> allows you to pass dicts directly to the hmset function.</p>
+<p>Here&#8217;s the relevant code (adapted for the example) in signals.py:</p>
+<pre class="brush: python; title: ; notranslate" title="">import redis
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from yourapp.models import YourModel
+
+@receiver(post_save, sender=YourModel, dispatch_uid=&quot;yourmodel_create&quot;)
+def addYourModelToRedis(sender, instance, **kwargs):
+	r = redis.StrictRedis(host='localhost', port=6379, db=0)
+	yourmodel_dict = {
+		'uid': instance.user.id,
+		'number1': instance.number_1,
+		'number2': instance.number_2,
+		'status': instance.status
+	}
+	r.hmset('yourmodel:' + instance.uniqueKey, yourmodel_dict)
+
+@receiver(post_delete, sender=YourModel, dispatch_uid=&quot;yourmodel_delete&quot;)
+def removeYourModelFromRedis(sender, instance, **kwargs):
+	r = redis.StrictRedis(host='localhost', port=6379, db=0)
+	r.delete('yourmodel:' + instance.uniqueKey)</pre>
+<p>The &#8220;dispatch_uid&#8221; parameter passed to the receiver decorator is intended to keep the signal from being acted upon more than once per save/deletion of a model. All the Django documentation says is to use a unique string; they don&#8217;t recommend that you use a specific format and it doesn&#8217;t seem to matter as long as it&#8217;s unique. Another thing to note is that the &#8216;instance&#8217; parameter for my handler functions is specific to the post_save and post_delete signals. In general signal handlers are expected to take &#8220;sender&#8221; and &#8220;**kwargs.&#8221; However it&#8217;s safe to extract the &#8216;instance&#8217; variable from **kwargs in the function definition when only being used for these specific signals. More information about signals and handling signals can be found in the <a href="https://docs.djangoproject.com/en/dev/topics/signals/" onclick="__gaTracker('send', 'event', 'outbound-article', 'https://docs.djangoproject.com/en/dev/topics/signals/', 'Django documentation.');">Django documentation.</a></p>
+       </div>
+      </div>
+      <dl class="post_meta">
+        <dt class="meta_date">2013</dt>
+         <dd class="post_date">08<span>/18</span></dd>
+                <dt>CATEGORY</dt>
+         <dd><a href="../../category/code/index.html" rel="category tag">Code</a></dd>
+                                 <dt class="meta_comment"><a href="../../index.html%3Fp=244.html#respond"><span class="dsq-postid" data-dsqidentifier="244 http://www.gnewt.at/blog/?p=244">Write comment</span></a></dt>
+               </dl>
+     </div>
+    </div>
+
+
+    <div class="content_noside">
+     <div class="page_navi clearfix">
+
+</div>
+    </div>
+
+   </div><!-- #left_col end -->
+
+   <div id="right_col">
+  
+    <div id="information_area" class="clearfix">
+   <div class="side_box" id="information">
+    <h3>Information</h3>
+    <div id="information_contents">I'm Gnewt and I make things.</div>
+   </div>
+      <div id="entries_rss">
+    <a href="../../feed/index.html" title="Entries RSS" >RSS FEED</a>
+   </div>
+     </div>
+  
+    <div class="side_box" id="search_area_top">
+   <div id="search_area" class="clearfix">
+        <form method="get" id="searchform" action="../../../index.html">
+     <div><input type="text" value="Search" name="s" id="search_input" onfocus="this.value=''; changefc('white');" /></div>
+     <div><input type="image" src="../../wp-content/themes/monochrome/img/search_button.gif" alt="Search from this blog." title="Search from this blog." id="search_button" /></div>
+    </form>
+       </div>
+     </div>
+  
+  
+   <div class="side_box">
+   <h3>Recent entry</h3>
+    <ul>
+     <li class="side_date">2014-04-14</li>
+     <li><a href="../../index.html%3Fp=291.html">BHS Shirt Sales with Django</a></li>
+     <li class="side_date">2014-01-14</li>
+     <li><a href="../../index.html%3Fp=276.html">What Would the Bhagavad Gita Say?</a></li>
+     <li class="side_date">2013-09-15</li>
+     <li><a href="../../index.html%3Fp=250.html">Weekend Project: Web-controlled Christmas Lights with Node.js, Arduino, and Raspberry Pi</a></li>
+     <li class="side_date">2013-08-18</li>
+     <li><a href="../../index.html%3Fp=244.html">Publishing Data to Redis with Django Signals</a></li>
+     <li class="side_date">2012-07-13</li>
+     <li><a href="../../index.html%3Fp=235.html">Scripting an Ice Cream Delivery with the Android SDK</a></li>
+   </ul>
+  </div>
+
+   <div class="side_box">
+   <h3>Archive</h3>
+   <ul>
+    	<li><a href='../../2014/04/index.html'>April 2014</a></li>
+	<li><a href='../../2014/01/index.html'>January 2014</a></li>
+	<li><a href='../09/index.html'>September 2013</a></li>
+	<li><a href='index.html'>August 2013</a></li>
+	<li><a href='../../2012/07/index.html'>July 2012</a></li>
+	<li><a href='../../2012/06/index.html'>June 2012</a></li>
+	<li><a href='../../2011/05/index.html'>May 2011</a></li>
+	<li><a href='../../2010/05/index.html'>May 2010</a></li>
+	<li><a href='../../2010/04/index.html'>April 2010</a></li>
+	<li><a href='../../2009/10/index.html'>October 2009</a></li>
+	<li><a href='../../2009/03/index.html'>March 2009</a></li>
+   </ul>
+   </div>
+
+   <div class="side_box">
+   <h3>Category</h3>
+   <ul>
+    	<li class="cat-item cat-item-23"><a href="../../category/code/index.html" >Code</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="../../category/uncategorized/index.html" >Uncategorized</a>
+</li>
+   </ul>
+   </div>
+
+
+  
+</div><!-- #right_col end -->
+  </div><!-- #contents end -->
+
+  <div id="footer">
+   <ul id="copyright">
+    <li style="background:none;">
+                Copyright &copy;&nbsp; 2009-2017     &nbsp;<a href="../../../index.html">Gnewt&#039;s Blag</a></li>
+    <li><a href="http://www.mono-lab.net/">Theme designed by mono-lab</a></li>
+    <li><a href="http://wordpress.org/">Powered by WordPress</a></li>
+   </ul>
+  </div>
+ 
+</div><!-- #wrapper end -->
+
+<div id="return_top">
+ <a href="index.html#wrapper">&nbsp;</a>
+</div>
+
+<script type='text/javascript' src='../../wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js%3Fver=3.0.9b'></script>
+<script type='text/javascript' src='../../wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPython.js%3Fver=3.0.9b'></script>
+<script type='text/javascript'>
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://www.gnewt.at/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://www.gnewt.at/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+</script>
+<script type='text/javascript' src='../../wp-includes/js/wp-embed.min.js%3Fver=4.7.2'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var countVars = {"disqusShortname":"gnewt"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='../../wp-content/plugins/disqus-comment-system/media/js/count.js%3Fver=4.7.2'></script>
+</body>
+</html>
+<!-- Dynamic page generated in 0.050 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2017-02-01 13:12:34 -->

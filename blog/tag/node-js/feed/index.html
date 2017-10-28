@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>node.js &#8211; Gnewt&#039;s Blag</title>
+	<atom:link href="http://www.gnewt.at/blog/tag/node-js/feed/" rel="self" type="application/rss+xml" />
+	<link>http://www.gnewt.at/blog</link>
+	<description>She turned me into a Gnewt! I got better...</description>
+	<lastBuildDate>Mon, 14 Apr 2014 16:59:55 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=4.7.2</generator>
+	<item>
+		<title>Weekend Project: Web-controlled Christmas Lights with Node.js, Arduino, and Raspberry Pi</title>
+		<link>http://www.gnewt.at/blog/2013/09/christmas-lights-with-node-js-arduino-raspberry-pi/</link>
+		<comments>http://www.gnewt.at/blog/2013/09/christmas-lights-with-node-js-arduino-raspberry-pi/#comments</comments>
+		<pubDate>Sun, 15 Sep 2013 20:03:38 +0000</pubDate>
+		<dc:creator><![CDATA[Gnewt]]></dc:creator>
+				<category><![CDATA[Code]]></category>
+		<category><![CDATA[arduino]]></category>
+		<category><![CDATA[christmas lights]]></category>
+		<category><![CDATA[node.js]]></category>
+		<category><![CDATA[raspberry pi]]></category>
+
+		<guid isPermaLink="false">http://www.gnewt.at/blog/?p=250</guid>
+		<description><![CDATA[This is my Node.js &#8220;hello world.&#8221; It&#8217;s a weekend project that allows you to control GE Color Effects lights over the internet through the use of a Raspberry Pi (running nginx and a Node.js application) connected to an Arduino. Like I say in the video, I think it may be possible to control the data [&#8230;]]]></description>
+				<content:encoded><![CDATA[<p><a href="http://www.gnewt.at/blog/wp-content/uploads/2013/09/christmaslights.jpg"><img class="aligncenter size-medium wp-image-255" alt="Christmas Lights" src="http://www.gnewt.at/blog/wp-content/uploads/2013/09/christmaslights-300x199.jpg" width="300" height="199" srcset="http://www.gnewt.at/blog/wp-content/uploads/2013/09/christmaslights-300x199.jpg 300w, http://www.gnewt.at/blog/wp-content/uploads/2013/09/christmaslights-1024x680.jpg 1024w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>This is my Node.js &#8220;hello world.&#8221; It&#8217;s a weekend project that allows you to control GE Color Effects lights over the internet through the use of a Raspberry Pi (running nginx and a Node.js application) connected to an Arduino. Like I say in the video, I think it may be possible to control the data line of these lights directly from the Raspberry Pi&#8217;s GPIO pins, but I <a href="https://github.com/Gnewt/circular-christmas-lights">already wrote an Arduino library</a> to handle that and it works nicely.</p>
+<p><iframe width="500" height="375" src="http://www.youtube.com/embed/NFm5xcVaPGo?feature=oembed" frameborder="0" allowfullscreen></iframe></p>
+<h2>Tech Stuff</h2>
+<p>The setup is fairly simple. The Raspberry Pi runs a frontend with my webserver of choice, nginx. It serves up a static page on / and proxies to my Node.js application on /api. Post data sent to /api is decoded by the Node application and matched with a hex value (assuming the color sent was valid). This hex value is then packed into the two-byte serial format I developed for my Arduino library, and sent over serial to the Arduino. Internally the Arduino uses a data structure called a <a href="http://en.wikipedia.org/wiki/Circular_buffer">circular buffer</a>. Circular buffers are especially cool for this usage, because when I &#8216;push&#8217; a light onto the string of lights, every single light needs to be updated (as each color is &#8216;moving&#8217; down the line). With a circular buffer, the data structure remains a constant size, and all that&#8217;s required to update it is to write a new value at the &#8216;head&#8217; location and then increment the location of the head. More specifics about how this works can be found in the linked Wikipedia article as well as the source code for the aforementioned Arduino library.</p>
+<p>I had a lot of fun with this project. One thing I really like about Node.js is how simple it makes creating APIs that can do Really Cool Things. Using just the JavaScript environment available in my web browser, I can package the color data in the format Node needs it, and let Node handle the rest. Node.js is not for everything, but the ease of communication between browser and application makes it a joy to work with.</p>
+<h2>Do It Yourself</h2>
+<p>Get a Raspberry Pi set up with Node.js installed, and an Arduino with the sketch linked below flashed to it. To flash the Arduino, you need the <a href="http://www.digitalmisery.com/2011/11/ge-color-effects-arduino-library/">GEColorEffects library</a> as a dependency.  Connection to the lights themselves is outside of the scope of this post, but more info can be found in <a href="http://www.deepdarc.com/2010/11/27/hacking-christmas-lights/">darco&#8217;s original post</a>. Clone the nodejs-christmas-lights git repository onto the Raspberry Pi. Ensure that the Arduino manifests as a serial port (usually /dev/ttyACM0) on the RPi, and chmod it to be accessible by your user. A simple &#8216;chmod 777 /dev/ttyACM0&#8217; should do, since (hopefully&#8230;) your Raspberry Pi isn&#8217;t a production box.</p>
+<p>Set up nginx on your Raspberry Pi, and put the contents of the nodejs-christmas-lights repository&#8217;s www folder in your webroot. Again, this is more or less outside the scope of this post, but the following config should act as a starting point. Important to note is that the /api path must forward to the host/port of your Node.js application.</p>
+<pre>server {
+    listen 80;
+    server_name lights;
+
+    root /var/www/vhosts/lights/htdocs;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api {
+        proxy_pass http://localhost:8080;
+    }
+}</pre>
+<p>If all is set up correctly, navigate to the Raspberry Pi in your browser, choose a color, and hit the &#8216;Go!&#8217; button.</p>
+<h2>Resources</h2>
+<ul>
+<li>Circular Buffer Christmas Lights (Arduino sketch): <a href="https://github.com/Gnewt/circular-christmas-lights">Github</a></li>
+<li>GE Color Effects library: <a href="http://www.digitalmisery.com/2011/11/ge-color-effects-arduino-library/">GE Color Effects Arduino Library</a></li>
+<li>Node.js Christmas Lights: <a href="https://github.com/Gnewt/nodejs-christmas-lights">Github</a></li>
+<li>Darco&#8217;s original post: <a href="http://www.deepdarc.com/2010/11/27/hacking-christmas-lights/">Hacking Christmas Lights</a></li>
+</ul>
+<p>Feel free to ask questions in the comments. If you do something cool with this code, I&#8217;d love to hear about it!</p>
+]]></content:encoded>
+			<wfw:commentRss>http://www.gnewt.at/blog/2013/09/christmas-lights-with-node-js-arduino-raspberry-pi/feed/</wfw:commentRss>
+		<slash:comments>5</slash:comments>
+		</item>
+	</channel>
+</rss>
+
+<!-- Dynamic page generated in 0.043 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2017-02-01 13:12:36 -->
